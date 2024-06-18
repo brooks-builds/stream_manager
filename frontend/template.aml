@@ -1,0 +1,7 @@
+// template.aml
+align [alignment: "center"]
+    border
+        vstack
+            text [foreground: "yellow"] "You"
+            text [foreground: "red"] "are"
+            text [foreground: "blue"] "great!"

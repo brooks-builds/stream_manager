@@ -12,11 +12,14 @@ tokio = { version = "1.37.0", features = ["net", "rt-multi-thread", "macros"] }
 twitch_events_listener = { path = "../twitch_events_listener/" }
 change_helix_theme = { path = "../change_helix_theme/" }
 change_alacritty_font = { path = "../change_alacritty_font/" }
-twitch_api = { features = ["helix", "reqwest", "eventsub"], git = "https://github.com/twitch-rs/twitch_api", rev = "788c4ea" }
+frontend = { path = "frontend" }
 
+twitch_api = { features = ["helix", "reqwest", "eventsub"], git = "https://github.com/twitch-rs/twitch_api", rev = "788c4ea" }
 [patch.crates-io.twitch_types]
 git = "https://github.com/twitch-rs/twitch_api"
 # path = "../../forks/twitch_api/twitch_types"
 rev = "788c4ea" # only if you pinned the repo to a specific revision
 
 
+[workspace]
+members = ["frontend"]
