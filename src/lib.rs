@@ -35,6 +35,12 @@ pub async fn run(stream_events: Receiver<StreamEvent>, config: Config) -> Result
                     change_alacritty_font(&path, &previous_font, "brookzerker", true).unwrap();
                 }
                 StreamEvent::Unknown => eprintln!("got an unknown stream event"),
+                StreamEvent::AdBreakBegin { duration } => {
+                    println!("ad break started, will last for {duration:?}")
+                }
+                StreamEvent::ChatMessage { username } => {
+                    println!("got a chat message from {username}")
+                }
             }
         })
         .await
