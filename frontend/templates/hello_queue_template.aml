@@ -3,5 +3,5 @@ vstack
     border
         vstack
             text "Hello Queue (click to acknowledge)"
-                for name in names
-                    text [foreground: "yellow"] name
+            for name in names
+                text [foreground: "yellow"] name

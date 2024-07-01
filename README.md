@@ -3,10 +3,13 @@
 ## Todo
 
 - [x] auto log in with axum server
-- [ ] Hello list
+- [x] Hello list
   - [x] sending event
-- [ ] Ads pops up during ads
+  - [x] displaying usernames
+  - [x] removing usernames on click
+- [ ] Message pops up during ads
   - [x] sending event
+  - [ ] Display Ads message when ads are playing
 - [ ] change theme
   - [ ] sending event
 - [ ] reset theme
