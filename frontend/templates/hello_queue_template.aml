@@ -1,7 +1,7 @@
 // template.aml
 vstack
-    text "Hello Queue"
     border
         vstack
-            for name in names
-                text [foreground: "yellow"] name
+            text "Hello Queue (click to acknowledge)"
+                for name in names
+                    text [foreground: "yellow"] name

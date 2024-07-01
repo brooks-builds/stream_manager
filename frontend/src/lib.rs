@@ -21,6 +21,7 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
     let backend = TuiBackend::builder()
         .enable_alt_screen()
         .enable_raw_mode()
+        .enable_mouse()
         .hide_cursor()
         .finish()
         .context("building the backend")?;
@@ -82,6 +83,30 @@ impl Component for HelloQueue {
         _elements: anathema::widgets::Elements<'_, '_>,
     ) {
         state.names.push(message);
+    }
+
+    fn on_mouse(
+        &mut self,
+        mouse: anathema::component::MouseEvent,
+        state: &mut Self::State,
+        mut elements: anathema::widgets::Elements<'_, '_>,
+    ) {
+        if !mouse.lsb_up() {
+            return;
+        };
+
+        let mut found = false;
+
+        elements
+            .query(&state)
+            .at_position(mouse.pos())
+            .first(|el, att| {
+                found = true;
+            });
+
+        if found {
+            state.names.pop_front();
+        }
     }
 }
 

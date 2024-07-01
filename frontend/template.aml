@@ -1,5 +1,6 @@
 // template.aml
-align [alignment: "center"]
+vstack
+    text "Test Component"
     border
         vstack
             text [foreground: "yellow"] "You"
