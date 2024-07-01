@@ -1,2 +1,2 @@
-border
-	@helloqueue
+vstack
+		@helloqueue

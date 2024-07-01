@@ -1,21 +1,24 @@
-use std::{fs::read_to_string, thread::spawn};
+pub mod events;
+
+use std::fs::read_to_string;
 
 use anathema::{
     backend::tui::TuiBackend,
     component::Component,
-    runtime::{Emitter, Runtime},
-    state::{State, Value},
+    runtime::Runtime,
+    state::{List, State, Value},
     templates::Document,
-    widgets::components::ComponentId,
 };
+use events::Events;
 use eyre::{Context, Result};
+use tokio::{sync::mpsc::Receiver, task::spawn_blocking};
 
-pub fn run() -> Result<()> {
+pub fn run(mut events: Receiver<Events>) -> Result<()> {
     let hello_queue_template = read_to_string("templates/hello_queue_template.aml")
         .context("loading the hello queue template")?;
     let index_template = read_to_string("templates/index.aml").context("loading index template")?;
-    let mut doc = Document::new(index_template);
-    let mut backend = TuiBackend::builder()
+    let doc = Document::new(index_template);
+    let backend = TuiBackend::builder()
         .enable_alt_screen()
         .enable_raw_mode()
         .hide_cursor()
@@ -29,33 +32,40 @@ pub fn run() -> Result<()> {
         hello_queue_template,
         HelloQueue,
         HelloQueueState {
-            name: "hi there".to_owned().into(),
+            names: List::empty(),
         },
     );
 
     let mut runtime = runtime_builder.finish().context("Creating runtime")?;
-    let mut emitter = runtime.emitter();
+    let emitter = runtime.emitter();
 
-    let thread = spawn(move || {
-        send_messages(emitter, hello_queue_component);
+    emitter
+        .emit("testing 123", hello_queue_component)
+        .context("testing emitter")
+        .unwrap();
+
+    spawn_blocking(move || loop {
+        let Some(event) = events.blocking_recv() else {
+            continue;
+        };
+
+        match event {
+            Events::HelloMessage(username) => {
+                emitter
+                    .emit(username, hello_queue_component)
+                    .context("emitting username to hello queue component")
+                    .unwrap();
+            }
+        };
     });
 
-    runtime.run().context("Running the tui")?;
-
-    thread.join().unwrap();
+    runtime
+        .run()
+        .context("Running the tui")
+        .context("running anathema")
+        .unwrap();
 
     Ok(())
-}
-
-// Send a string to a recipient every second
-fn send_messages(emitter: Emitter, recipient: ComponentId) {
-    let mut counter = 0;
-
-    loop {
-        emitter.emit(format!("{counter} message"), recipient);
-        counter += 1;
-        std::thread::sleep_ms(2000);
-    }
 }
 
 struct HelloQueue;
@@ -69,13 +79,13 @@ impl Component for HelloQueue {
         &mut self,
         message: Self::Message,
         state: &mut Self::State,
-        mut elements: anathema::widgets::Elements<'_, '_>,
+        _elements: anathema::widgets::Elements<'_, '_>,
     ) {
-        state.name = message.into();
+        state.names.push(message);
     }
 }
 
 #[derive(State)]
 struct HelloQueueState {
-    pub name: Value<String>,
+    pub names: Value<List<String>>,
 }

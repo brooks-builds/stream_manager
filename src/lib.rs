@@ -1,14 +1,31 @@
 pub mod config;
+mod hello_queue;
+mod state;
 
 use change_alacritty_font::change_alacritty_font;
 use config::Config;
 use eyre::{Context, Result};
-use std::{sync::mpsc::Receiver, time::Duration};
-use tokio::time::sleep;
+use frontend::events::Events;
+use state::State;
+use std::{
+    sync::{mpsc::Receiver, Arc, Mutex},
+    time::Duration,
+};
+use tokio::{sync::mpsc::Sender, time::sleep};
 use twitch_events_listener::stream_event::StreamEvent;
 
-pub async fn run(stream_events: Receiver<StreamEvent>, config: Config) -> Result<()> {
+use crate::hello_queue::hello_queue;
+
+pub async fn run(
+    stream_events: Receiver<StreamEvent>,
+    config: Config,
+    frontend_events: Sender<Events>,
+) -> Result<()> {
+    let state = Arc::new(Mutex::new(State::default()));
+
     loop {
+        let state = state.clone();
+        let frontend_events = frontend_events.clone();
         let config = config.clone();
         let stream_event = stream_events
             .recv()
@@ -16,6 +33,8 @@ pub async fn run(stream_events: Receiver<StreamEvent>, config: Config) -> Result
             .unwrap();
 
         tokio::spawn(async move {
+            let state = state.clone();
+
             match stream_event {
                 StreamEvent::ChangeHelixTheme { username, theme } => {
                     println!("{username} changed the Helix theme to {theme}");
@@ -39,7 +58,10 @@ pub async fn run(stream_events: Receiver<StreamEvent>, config: Config) -> Result
                     println!("ad break started, will last for {duration:?}")
                 }
                 StreamEvent::ChatMessage { username } => {
-                    println!("got a chat message from {username}")
+                    hello_queue(username, state, frontend_events)
+                        .await
+                        .context("running hello queue")
+                        .unwrap();
                 }
             }
         })

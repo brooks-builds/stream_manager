@@ -1,7 +1,7 @@
 // template.aml
-align [alignment: "center"]
+vstack
+    text "Hello Queue"
     border
         vstack
-            text [foreground: "yellow"] name
-            text [foreground: "red"] "are"
-            text [foreground: "blue"] "great!"
+            for name in names
+                text [foreground: "yellow"] name

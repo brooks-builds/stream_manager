@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 anathema = { git = "https://github.com/togglebyte/anathema/", branch = "dev" }
 eyre = "0.6.12"
+tokio = { version = "1.38.0", features = ["sync"] }

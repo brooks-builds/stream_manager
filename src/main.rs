@@ -1,7 +1,7 @@
 use dotenvy::dotenv;
 use std::sync::mpsc::{self};
 use stream_manager::config::Config;
-use twitch_events_listener::{config::Config as TwitchEventsListenerConfig, run};
+use twitch_events_listener::{config::Config as TwitchEventsListenerConfig, get_code, run};
 
 #[tokio::main]
 async fn main() {
@@ -13,14 +13,21 @@ async fn main() {
         "/Users/brookzerker/.config/alacritty/font.toml",
     );
     let (sender, receiver) = mpsc::channel();
+    let user_token = get_code(&twitch_events_listener_config).await.unwrap();
+    let (frontend_sender, frontend_receiver) =
+        tokio::sync::mpsc::channel::<frontend::events::Events>(10);
 
     tokio::spawn(async {
-        frontend::run().unwrap();
+        run(twitch_events_listener_config, sender, user_token)
+            .await
+            .unwrap();
     });
 
     tokio::spawn(async {
-        run(twitch_events_listener_config, sender).await.unwrap();
+        frontend::run(frontend_receiver).unwrap();
     });
 
-    stream_manager::run(receiver, config).await.unwrap();
+    stream_manager::run(receiver, config, frontend_sender)
+        .await
+        .unwrap();
 }

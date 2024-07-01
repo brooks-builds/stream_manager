@@ -706,6 +706,7 @@ version = "0.1.0"
 dependencies = [
  "anathema",
  "eyre",
+ "tokio",
 ]
 
 [[package]]
