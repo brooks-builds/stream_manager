@@ -1,7 +1,7 @@
 mod components;
 pub mod events;
 
-use std::fs::read_to_string;
+use std::{fs::read_to_string, thread::sleep, time::Duration};
 
 use anathema::{
     backend::tui::TuiBackend,
@@ -55,11 +55,6 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
     let mut runtime = runtime_builder.finish().context("Creating runtime")?;
     let emitter = runtime.emitter();
 
-    emitter
-        .emit("testing 123", hello_queue_component)
-        .context("testing emitter")
-        .unwrap();
-
     spawn_blocking(move || loop {
         let Some(event) = events.blocking_recv() else {
             continue;
@@ -72,10 +67,31 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
                     .context("emitting username to hello queue component")
                     .unwrap();
             }
-            Events::TwitchAds(duration) => emitter
-                .emit(duration, twitch_ads_component)
-                .context("twitch ads just started")
-                .unwrap(),
+            Events::TwitchAds(duration) => {
+                emitter
+                    .emit(duration.clone(), twitch_ads_component)
+                    .context("twitch ads just started")
+                    .unwrap();
+
+                {
+                    let mut duration = duration;
+                    let emitter = emitter.clone();
+
+                    spawn_blocking(move || {
+                        let one_second = Duration::from_secs(1);
+
+                        while duration.as_secs() > 0 {
+                            duration -= one_second;
+                            emitter
+                                .emit(duration, twitch_ads_component)
+                                .context("sending count down ad time")
+                                .unwrap();
+
+                            sleep(one_second);
+                        }
+                    });
+                }
+            }
         };
     });
 

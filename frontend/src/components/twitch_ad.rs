@@ -18,7 +18,7 @@ impl Component for TwitchAds {
         state: &mut Self::State,
         mut _elements: anathema::widgets::Elements<'_, '_>,
     ) {
-        let time_remaining = message.as_secs()
+        let time_remaining = message.as_secs();
 
         state.time_remaining.set(time_remaining);
     }

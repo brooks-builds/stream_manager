@@ -55,7 +55,11 @@ pub async fn run(
                 }
                 StreamEvent::Unknown => eprintln!("got an unknown stream event"),
                 StreamEvent::AdBreakBegin { duration } => {
-                    println!("ad break started, will last for {duration:?}")
+                    frontend_events
+                        .send(Events::TwitchAds(duration))
+                        .await
+                        .context("sending duration of twitch ads")
+                        .unwrap();
                 }
                 StreamEvent::ChatMessage { username } => {
                     hello_queue(username, state, frontend_events)

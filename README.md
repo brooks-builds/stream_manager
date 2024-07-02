@@ -7,13 +7,16 @@
   - [x] sending event
   - [x] displaying usernames
   - [x] removing usernames on click
-- [ ] Message pops up during ads
+- [x] Message pops up during ads
   - [x] sending event
-  - [ ] Display Ads message when ads are playing
+  - [x] Display Ads message when ads are playing
 - [ ] change theme
-  - [ ] sending event
-- [ ] reset theme
-  - [ ] sending event
+  - [x] sending event
+  - [ ] display message on frontend
+  - [ ] announce out loud
+  - [ ] validate that it is using a real font
+  - [ ] change back after a timer runs out
+  - [ ] Button to keep new font as my chosen font
 - [ ] choose / start raid
   - [ ] sending event
 - [ ] shoutout on raid

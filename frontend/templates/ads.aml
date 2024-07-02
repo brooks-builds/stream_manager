@@ -1,3 +1,6 @@
 border
-	text "Ad break: "
-		span "60"
+	if time_remaining == 0
+		text "Ads not running"
+	else
+		text "Ad break: "
+			span time_remaining
