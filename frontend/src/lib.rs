@@ -32,7 +32,7 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
         .finish()
         .context("building the backend")?;
 
-    let mut runtime_builder = Runtime::new(doc, backend);
+    let mut runtime_builder = Runtime::builder(doc, backend);
 
     let hello_queue_component = runtime_builder.register_component(
         "helloqueue",
@@ -63,13 +63,13 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
         match event {
             Events::HelloMessage(username) => {
                 emitter
-                    .emit(username, hello_queue_component)
+                    .emit(hello_queue_component, username)
                     .context("emitting username to hello queue component")
                     .unwrap();
             }
             Events::TwitchAds(duration) => {
                 emitter
-                    .emit(duration.clone(), twitch_ads_component)
+                    .emit(twitch_ads_component, duration.clone())
                     .context("twitch ads just started")
                     .unwrap();
 
@@ -83,7 +83,7 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
                         while duration.as_secs() > 0 {
                             duration -= one_second;
                             emitter
-                                .emit(duration, twitch_ads_component)
+                                .emit(twitch_ads_component, duration)
                                 .context("sending count down ad time")
                                 .unwrap();
 
