@@ -10,13 +10,12 @@
 - [x] Message pops up during ads
   - [x] sending event
   - [x] Display Ads message when ads are playing
-- [ ] change theme
+- [x] change theme
   - [x] sending event
-  - [ ] display message on frontend
-  - [ ] announce out loud
-  - [ ] validate that it is using a real font
-  - [ ] change back after a timer runs out
-  - [ ] Button to keep new font as my chosen font
+  - [x] display message on frontend
+  - [x] announce out loud
+  - [x] validate that it is using a real font
+  - [x] show how long I have to keep theme
 - [ ] choose / start raid
   - [ ] sending event
 - [ ] shoutout on raid

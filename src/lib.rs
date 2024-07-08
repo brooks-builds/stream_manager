@@ -3,6 +3,7 @@ mod hello_queue;
 mod state;
 
 use change_alacritty_font::change_alacritty_font;
+use change_helix_theme::{select_random_theme, validate_theme};
 use config::Config;
 use eyre::{Context, Result};
 use frontend::events::Events;
@@ -37,10 +38,25 @@ pub async fn run(
 
             match stream_event {
                 StreamEvent::ChangeHelixTheme { username, theme } => {
-                    println!("{username} changed the Helix theme to {theme}");
+                    let theme = if theme.to_lowercase() == "random" {
+                        select_random_theme()
+                    } else {
+                        &theme
+                    };
 
-                    change_helix_theme::change_helix_theme(&config.helix_config_path, &theme)
-                        .unwrap()
+                    if validate_theme(&theme) {
+                        frontend_events
+                            .send(Events::ThemeChanged {
+                                username,
+                                theme: theme.to_owned(),
+                            })
+                            .await
+                            .context("sending theme event to frontend")
+                            .unwrap();
+
+                        change_helix_theme::change_helix_theme(&config.helix_config_path, &theme)
+                            .unwrap();
+                    }
                 }
                 StreamEvent::ChangeFont { username, font } => {
                     println!("{username} changing the font to {font}");

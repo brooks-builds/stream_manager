@@ -1,0 +1,8 @@
+border
+	vstack
+		text "Theme: " name
+			if username
+				span " set by " username
+		text ""
+		if keep_for
+			text "Keep for at least " keep_for " seconds"

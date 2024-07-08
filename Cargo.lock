@@ -393,6 +393,7 @@ version = "0.1.0"
 dependencies = [
  "dotenvy",
  "eyre",
+ "rand",
  "toml_edit",
 ]
 
@@ -2068,6 +2069,7 @@ dependencies = [
  "dotenvy",
  "eyre",
  "frontend",
+ "rand",
  "tokio",
  "twitch_api",
  "twitch_events_listener",

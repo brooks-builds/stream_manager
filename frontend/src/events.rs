@@ -4,4 +4,5 @@ use std::time::Duration;
 pub enum Events {
     HelloMessage(String),
     TwitchAds(Duration),
+    ThemeChanged { username: String, theme: String },
 }
