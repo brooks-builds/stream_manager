@@ -1,7 +1,7 @@
 mod components;
 pub mod events;
 
-const KEEP_HX_THEME_FOR: Duration = Duration::from_secs(60 * 15);
+const KEEP_HX_THEME_FOR: Duration = Duration::from_secs(60 * 5);
 const ONE_SECOND: Duration = Duration::from_secs(1);
 
 use std::{fs::read_to_string, thread::sleep, time::Duration};
@@ -123,7 +123,7 @@ pub fn run(mut events: Receiver<Events>) -> Result<()> {
                 {
                     let emitter = emitter.clone();
 
-                    spawn_blocking(move || {
+                    let handle = spawn_blocking(move || {
                         let mut duration = KEEP_HX_THEME_FOR;
 
                         while !duration.is_zero() {
