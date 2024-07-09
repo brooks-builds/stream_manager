@@ -2,7 +2,7 @@ pub mod config;
 mod hello_queue;
 mod state;
 
-use change_alacritty_font::change_alacritty_font;
+use change_alacritty_font::{change_alacritty_font, validate_font};
 use change_helix_theme::{select_random_theme, validate_theme};
 use config::Config;
 use eyre::{Context, Result};
@@ -12,7 +12,7 @@ use std::{
     sync::{mpsc::Receiver, Arc, Mutex},
     time::Duration,
 };
-use tokio::{sync::mpsc::Sender, time::sleep};
+use tokio::{spawn, sync::mpsc::Sender, time::sleep};
 use twitch_events_listener::stream_event::StreamEvent;
 
 use crate::hello_queue::hello_queue;
@@ -59,15 +59,56 @@ pub async fn run(
                     }
                 }
                 StreamEvent::ChangeFont { username, font } => {
-                    println!("{username} changing the font to {font}");
-                    let path = config.alacritty_font_config_path.clone();
+                    if validate_font(&font) {
+                        let path = config.alacritty_font_config_path.clone();
+                        let previous_font = change_alacritty_font(&path, &font, &username, false)
+                            .context("changing font")
+                            .unwrap();
+                        let reset_font_in = Duration::from_secs(60 * 15);
 
-                    let previous_font = change_alacritty_font(&path, &font, &username, false)
-                        .unwrap_or("Iosevka".to_owned());
+                        frontend_events
+                            .send(Events::FontChanged {
+                                username: username.clone(),
+                                font: font.clone(),
+                                time_left: reset_font_in.clone(),
+                            })
+                            .await
+                            .context("sending font changed message")
+                            .unwrap();
 
-                    sleep(Duration::from_secs(60 * 10)).await;
+                        spawn(async move {
+                            let mut reset_font_in = reset_font_in;
+                            let one_second = Duration::from_secs(1);
 
-                    change_alacritty_font(&path, &previous_font, "brookzerker", true).unwrap();
+                            while !reset_font_in.is_zero() {
+                                frontend_events
+                                    .send(Events::FontChanged {
+                                        username: username.clone(),
+                                        font: font.clone(),
+                                        time_left: reset_font_in.clone(),
+                                    })
+                                    .await
+                                    .context("sending time left for font")
+                                    .unwrap();
+
+                                reset_font_in -= one_second;
+                                sleep(one_second).await;
+                            }
+
+                            change_alacritty_font(&path, &previous_font, "brookzerker", true)
+                                .unwrap();
+
+                            frontend_events
+                                .send(Events::FontChanged {
+                                    username: "Brookzerker".to_owned(),
+                                    font: previous_font,
+                                    time_left: Duration::ZERO,
+                                })
+                                .await
+                                .context("sending font reset")
+                                .unwrap();
+                        });
+                    }
                 }
                 StreamEvent::Unknown => eprintln!("got an unknown stream event"),
                 StreamEvent::AdBreakBegin { duration } => {

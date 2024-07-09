@@ -16,7 +16,4 @@
   - [x] announce out loud
   - [x] validate that it is using a real font
   - [x] show how long I have to keep theme
-- [ ] record timestamps for when something interesting happens
-  - [ ] sending event
-- [ ] todo list
-- [ ] auto cut stream vods
+  - [x] show correct theme on startup

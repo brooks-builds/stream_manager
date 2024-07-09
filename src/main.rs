@@ -1,4 +1,7 @@
+use change_alacritty_font::get_current_font;
+use change_helix_theme::current_helix_theme;
 use dotenvy::dotenv;
+use eyre::Context;
 use std::sync::mpsc::{self};
 use stream_manager::config::Config;
 use twitch_events_listener::{config::Config as TwitchEventsListenerConfig, get_code, run};
@@ -16,6 +19,13 @@ async fn main() {
     let user_token = get_code(&twitch_events_listener_config).await.unwrap();
     let (frontend_sender, frontend_receiver) =
         tokio::sync::mpsc::channel::<frontend::events::Events>(10);
+    let helix_theme = current_helix_theme(&config.helix_config_path)
+        .context("loading helix theme")
+        .unwrap();
+    let font = get_current_font(config.alacritty_font_config_path.clone())
+        .context("getting font")
+        .unwrap();
+
     // create anathema runtime builder
     // create anathema emitter
 
@@ -25,9 +35,9 @@ async fn main() {
             .unwrap();
     });
 
-    tokio::spawn(async {
+    tokio::spawn(async move {
         // send anathema runtime builder into the function
-        frontend::run(frontend_receiver).unwrap();
+        frontend::run(frontend_receiver, helix_theme, font).unwrap();
     });
 
     // send anathema emitter
