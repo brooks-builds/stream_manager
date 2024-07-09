@@ -1,0 +1,6 @@
+border
+	if time_remaining == 0
+		text "Ads not running"
+	else
+		text "Ad break: "
+			span time_remaining

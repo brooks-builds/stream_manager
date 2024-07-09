@@ -9,8 +9,18 @@ edition = "2021"
 dotenvy = "0.15.7"
 eyre = "0.6.12"
 tokio = { version = "1.37.0", features = ["net", "rt-multi-thread", "macros"] }
-twitch_api = { version = "0.7.0-rc.7", features = ["eventsub", "reqwest", "helix"] }
 twitch_events_listener = { path = "../twitch_events_listener/" }
 change_helix_theme = { path = "../change_helix_theme/" }
 change_alacritty_font = { path = "../change_alacritty_font/" }
+frontend = { path = "frontend" }
 
+twitch_api = { features = ["helix", "reqwest", "eventsub"], git = "https://github.com/twitch-rs/twitch_api", rev = "788c4ea" }
+rand = "0.8.5"
+[patch.crates-io.twitch_types]
+git = "https://github.com/twitch-rs/twitch_api"
+# path = "../../forks/twitch_api/twitch_types"
+rev = "788c4ea" # only if you pinned the repo to a specific revision
+
+
+[workspace]
+members = ["frontend"]

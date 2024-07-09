@@ -2,21 +2,18 @@
 
 ## Todo
 
-- [ ] Hello list
+- [x] auto log in with axum server
+- [x] Hello list
   - [x] sending event
-- [ ] Ads pops up during ads
+  - [x] displaying usernames
+  - [x] removing usernames on click
+- [x] Message pops up during ads
   - [x] sending event
-- [ ] Countdown to next ad
-  - having "fun" getting next ad time from main branch. Twitch is really cool so we forked
-    - Esitsu: You might have been able to call req_get_custom with your own struct instead of forking.
-  - [ ] sending event
-- [ ] change theme
-  - [ ] sending event
-- [ ] reset theme
-  - [ ] sending event
-- [ ] choose / start raid
-  - [ ] sending event
-- [ ] shoutout on raid
-  - [ ] sending event
-- [ ] record timestamps for when something interesting happens
-  - [ ] sending event
+  - [x] Display Ads message when ads are playing
+- [x] change theme
+  - [x] sending event
+  - [x] display message on frontend
+  - [x] announce out loud
+  - [x] validate that it is using a real font
+  - [x] show how long I have to keep theme
+  - [x] show correct theme on startup

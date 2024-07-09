@@ -1,0 +1,7 @@
+border
+	vstack
+		text "Font: " name 
+			if username 
+				span " set by " username
+		if time_left
+			text "resets in " time_left
